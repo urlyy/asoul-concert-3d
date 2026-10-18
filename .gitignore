@@ -1,0 +1,45 @@
+# Dependencies and build output
+node_modules/
+/dist/
+/dist-toy/
+/dist-toy.zip
+/.cache/
+/coverage/
+*.tsbuildinfo
+
+# Source PLY is backed up with Git LFS; other local captures stay ignored
+/assets/*
+!/assets/README.md
+!/assets/*.ply
+
+# Converted scene data is committed so Cloudflare can build without the source PLY.
+# Only atomic-write temporary manifests remain local.
+/public/scenes.*.json
+
+# Browser test output
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/blob-report/
+
+# Local environment and logs; examples remain versioned
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.log
+
+# OS and editor-local files
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+*.swp
+*.swo
+*~

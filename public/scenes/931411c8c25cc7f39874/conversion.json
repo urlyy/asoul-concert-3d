@@ -1,0 +1,14 @@
+{
+  "id": "931411c8c25cc7f39874",
+  "sourceName": "26年嘉然线下-newnew.ply",
+  "sourceBytes": 339555273,
+  "sourceCount": 2233910,
+  "levels": 7,
+  "settings": {
+    "converter": "3.6.6",
+    "pipeline": 1,
+    "chunkK": 128,
+    "coarseCount": 40000,
+    "shBands": 3
+  }
+}

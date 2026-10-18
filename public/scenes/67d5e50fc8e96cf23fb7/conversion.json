@@ -1,0 +1,14 @@
+{
+  "id": "67d5e50fc8e96cf23fb7",
+  "sourceName": "26年贝拉线下.ply",
+  "sourceBytes": 91519445,
+  "sourceCount": 387788,
+  "levels": 5,
+  "settings": {
+    "converter": "3.6.6",
+    "pipeline": 1,
+    "chunkK": 128,
+    "coarseCount": 40000,
+    "shBands": 3
+  }
+}

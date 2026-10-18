@@ -1,0 +1,79 @@
+{
+  "defaultScene": "931411c8c25cc7f39874",
+  "showSwitcher": true,
+  "scenes": [
+    {
+      "id": "c5d42007f18982f05371",
+      "name": "客厅",
+      "url": "scenes/c5d42007f18982f05371/lod-meta.json",
+      "rotation": [
+        180,
+        0,
+        0
+      ],
+      "camera": {
+        "position": [
+          -0.5646,
+          -0.6754,
+          -2.9509
+        ],
+        "target": [
+          9.3204,
+          -0.0893,
+          -4.3451
+        ]
+      }
+    },
+    {
+      "id": "931411c8c25cc7f39874",
+      "name": "26年嘉然线下演唱会",
+      "url": "scenes/931411c8c25cc7f39874/lod-meta.json",
+      "rotation": [
+        180,
+        0,
+        0
+      ],
+      "sourceUp": "unknown (assumed y)",
+      "camera": {
+        "position": [
+          -7.2948,
+          -0.0397,
+          3.9525
+        ],
+        "target": [
+          -13.0411,
+          -1.806,
+          -4.0388
+        ],
+        "moveSpeed": 2
+      }
+    },
+    {
+      "id": "67d5e50fc8e96cf23fb7",
+      "name": "26年贝拉线下演唱会",
+      "url": "scenes/67d5e50fc8e96cf23fb7/lod-meta.json",
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "sourceUp": "unknown (assumed y)",
+      "camera": {
+        "startDistanceScale": 1.08,
+        "centerHeightOffset": 0,
+        "position": [
+          1.501891851425171,
+          0.6117362380027771,
+          -1.159327507019043
+        ],
+        "quaternion": [
+          0.9877972133442858,
+          -0.009755803990356476,
+          -0.025179416587869905,
+          -0.15338672230039924
+        ],
+        "fov": 65
+      }
+    }
+  ]
+}

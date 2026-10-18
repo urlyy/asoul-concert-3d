@@ -1,0 +1,6 @@
+{
+  "camera": { "position": null, "target": null, "fov": 65, "moveSpeed": null, "startDistanceScale": 0, "centerHeightOffset": 0.25 },
+  "controls": { "sensitivity": 0.15, "rollSpeed": 90, "response": 10, "damping": 14 },
+  "performance": { "desktopBudget": 600000, "mobileBudget": 250000, "maxPixelRatio": 1.5, "adaptive": true },
+  "renderer": "auto"
+}
