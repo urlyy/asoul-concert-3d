@@ -82,6 +82,8 @@ npm test
 
 ## 文档与交付
 
+- README 面向已经能访问项目的首次使用者，说明本地运行、操作、导入自己的场景和 debug 起点采集；不讨论仓库私有状态、访问授权或需求变更过程。Toy、COS、Cloudflare 及发布流程放在本文件，不写成用户使用前提。
+
 - 变更命令、配置、键位、输入格式或部署结构时同步 README；目录职责和流程变更时同步本文件。
 - 交付说明写清改动、已执行的验证以及真实限制。构建通过不代表已上线，绘制数量预算也不等于总内存硬上限。
 - 发布对象是 `dist/` 的内容，包含完整的场景分块和许可证；运行环境不需要 Node.js。
@@ -136,6 +138,29 @@ npm run convert -- assets/新场景.ply --chunk-k 64 --coarse-count 20000 --sh-b
 初始视角采集步骤见 [README：设置场景初始视角](README.md#设置场景初始视角debug)。调试快照同时提供 `sceneId`、渲染器、相机姿态、速度、绘制数量、预算和像素比；必须等场景加载完成后读取。
 
 ## 部署实现与缓存
+
+COS 指腾讯云对象存储服务（Cloud Object Storage），用于托管 Toy 从外部加载的场景分块。本地运行不依赖 COS。
+
+### 普通静态部署
+
+```sh
+npm run build
+npm run preview
+```
+
+预览确认后，将 `dist/` 的完整内容上传到静态托管服务。Cloudflare Pages 使用构建命令 `npm run build`、输出目录 `dist`；可在生产和预览环境设置 `GIT_LFS_SKIP_SMUDGE=1`，跳过源 PLY 下载。场景目录与完整分块必须先提交到 GitHub；不将整个仓库作为发布目录。
+
+### Toy 与 COS 发布
+
+将完整的 `public/scenes/` 上传到 COS，在 `toy-build.config.json` 的 `assetBaseUrl` 设置 HTTPS 根目录，确保该地址下可访问 `scenes/<版本>/lod-meta.json`。分块需要匿名可读，并允许 Toy 页面跨域访问。
+
+```sh
+npm run build:toy
+```
+
+将生成的 `dist-toy.zip` 上传到 Toy。构建不会上传 COS 或发布 Toy。新增场景时，先上传完整的新版本分块，再重新打包并上传 ZIP。
+
+### 缓存
 
 
 这是独立小文件的流式加载，普通静态 GET 即可，**不依赖 HTTP Range**。无需 PotreeConverter、服务端转换或 PlayCanvas 账户。开启 HTTPS 可使用 WebGPU；不支持时走 WebGL 2。
