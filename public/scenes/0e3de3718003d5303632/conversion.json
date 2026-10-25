@@ -1,0 +1,14 @@
+{
+  "id": "0e3de3718003d5303632",
+  "sourceName": "26年团线下-宝可梦.ply",
+  "sourceBytes": 129067517,
+  "sourceCount": 546890,
+  "levels": 5,
+  "settings": {
+    "converter": "3.6.6",
+    "pipeline": 1,
+    "chunkK": 128,
+    "coarseCount": 40000,
+    "shBands": 3
+  }
+}
