@@ -73,10 +73,28 @@ try {
       });
       sceneList.append(button);
     }
+    const fitSceneMenu = () => {
+      sceneList.style.maxHeight = '';
+      if (sceneList.hidden || sceneList.scrollHeight <= sceneList.clientHeight) return;
+      const bounds = sceneList.getBoundingClientRect();
+      let height;
+      for (const button of sceneList.children) {
+        const row = button.getBoundingClientRect();
+        const partialHeight = row.top - bounds.top + row.height / 2;
+        if (partialHeight <= bounds.height) height = partialHeight;
+      }
+      // A partial row makes overflow visible even when mobile scrollbars hide.
+      if (height !== undefined) sceneList.style.maxHeight = `${Math.floor(height)}px`;
+    };
+    window.addEventListener('resize', fitSceneMenu, { signal: nativeZoomEvents.signal });
     sceneToggle.addEventListener('click', () => {
       sceneList.hidden = !sceneList.hidden;
       sceneToggle.setAttribute('aria-expanded', String(!sceneList.hidden));
-      if (!sceneList.hidden) controller?.clearInput();
+      if (!sceneList.hidden) {
+        controller?.clearInput();
+        sceneList.scrollTop = 0;
+        fitSceneMenu();
+      }
     });
   }
   await landscape.waitForLandscape();

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 
 const state = page => page.evaluate(() => window.__viewer.snapshot());
 const distance = (a, b) => Math.hypot(...a.map((v, i) => v - b[i]));
@@ -145,5 +146,64 @@ test.describe('mobile', () => {
       document.dispatchEvent(event);
       return event.defaultPrevented;
     })).toBe(true);
+  });
+
+  test('scene menu scrolls by touch over its buttons and selects the last scene', async ({ page, context }) => {
+    const catalog = JSON.parse(await readFile('public/scenes.json', 'utf8'));
+    const current = catalog.scenes.find(scene => scene.id === catalog.defaultScene);
+    const alternate = catalog.scenes.find(scene => scene.id !== current.id);
+    test.skip(!alternate, '需要两个已转换场景');
+    catalog.scenes = [current, ...Array.from({ length: 12 }, (_, i) => ({
+      ...current, id: `test-${i}`, name: `测试场景 ${i + 1}`
+    })), alternate];
+    await page.route('**/scenes.json', route => route.fulfill({ json: catalog }));
+    await open(page);
+    const home = await state(page);
+    await page.getByRole('button', { name: '场景', exact: true }).tap();
+    const list = page.locator('#scene-list');
+    for (const height of [320, 430, 390]) {
+      await page.setViewportSize({ width: 844, height });
+      await expect.poll(() => list.evaluate(element => {
+        const bottom = element.getBoundingClientRect().bottom;
+        return [...element.children].some(button => {
+          const row = button.getBoundingClientRect();
+          const visible = (bottom - row.top) / row.height;
+          return visible > 0.3 && visible < 0.7;
+        });
+      })).toBe(true);
+    }
+    await page.screenshot({ path: 'test-results/mobile-scene-menu-partial.png' });
+    const box = await list.boundingBox();
+    expect(await list.evaluate(element => element.scrollHeight)).toBeGreaterThan(box.height);
+    const cdp = await context.newCDPSession(page);
+    const swipeUp = async () => {
+      // Start on a menu button, using native touch input rather than scrollTop.
+      const x = box.x + box.width / 2;
+      const startY = box.y + box.height - 24;
+      const endY = box.y + 24;
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: startY, id: 1 }] });
+      for (let step = 1; step <= 12; step++) {
+        await cdp.send('Input.dispatchTouchEvent', {
+          type: 'touchMove', touchPoints: [{ x, y: startY + (endY - startY) * step / 12, id: 1 }]
+        });
+        await page.waitForTimeout(16);
+      }
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    };
+    await swipeUp();
+    await expect.poll(() => list.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+    expect((await state(page)).sceneId).toBe(current.id);
+    expect(distance((await state(page)).quaternion, home.quaternion)).toBeLessThan(0.0001);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    for (let i = 0; i < 6; i++) await swipeUp();
+    const last = page.getByRole('button', { name: alternate.name, exact: true });
+    await expect.poll(async () => {
+      const bounds = await last.boundingBox();
+      return bounds.y >= box.y && bounds.y + bounds.height <= box.y + box.height;
+    }).toBe(true);
+    await page.screenshot({ path: 'test-results/mobile-scene-menu.png' });
+    await last.tap();
+    await page.waitForFunction(id => window.__viewer?.snapshot().ready && window.__viewer.snapshot().sceneId === id, alternate.id);
+    expect(new URL(page.url()).searchParams.get('scene')).toBe(alternate.id);
   });
 });

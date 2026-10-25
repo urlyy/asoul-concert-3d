@@ -33,7 +33,7 @@
 | `toy-build.config.json` | Toy 的 HTTPS 场景资源目录，无凭据 |
 | `tests-toy/build.spec.js` / `playwright.toy.config.js` | Toy 产物跨域加载与错误测试，使用本地数据模拟远程响应 |
 | `tests/viewer.spec.js` | 构建产物的浏览器交互、流式加载、错误和完整性验证 |
-| `tests/screen-controls.spec.js` | 屏幕按键、手机双指、触摸取消、重置、横竖屏布局 |
+| `tests/screen-controls.spec.js` | 屏幕按键、手机双指、触摸取消、重置、横竖屏布局及场景菜单触摸滚动 |
 | `tests/flight.spec.js` | 完整俯仰翻转、横滚、沿机头前进、减速及重置 |
 | `playwright.config.js` | 本机 Chrome、单 worker、4173 端口、`/tour/` 子路径 |
 | `public/licenses/` | 随站点发布的第三方许可证 |
