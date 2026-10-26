@@ -50,7 +50,7 @@
     },
     {
       "id": "67d5e50fc8e96cf23fb7",
-      "name": "26年贝拉线下演唱会",
+      "name": "26年贝拉线下演唱会-白天",
       "url": "scenes/67d5e50fc8e96cf23fb7/lod-meta.json",
       "rotation": [
         0,
@@ -74,6 +74,17 @@
         ],
         "fov": 65
       }
+    },
+    {
+      "id": "e805fe7d70e48c87bf6d",
+      "name": "26年贝拉线下演唱会-晚上",
+      "url": "scenes/e805fe7d70e48c87bf6d/lod-meta.json",
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "sourceUp": "unknown (assumed y)"
     },
     {
       "id": "26cf9a1da51f2aa75143",

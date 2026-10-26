@@ -6,7 +6,8 @@
 | --- | --- |
 | `客厅.ply` | `c5d42007f18982f05371` |
 | `26年嘉然线下演唱会.ply` | `931411c8c25cc7f39874` |
-| `26年贝拉线下演唱会.ply` | `67d5e50fc8e96cf23fb7` |
+| `26年贝拉线下演唱会-白天.ply` | `67d5e50fc8e96cf23fb7` |
+| `26年贝拉线下演唱会-晚上.ply` | `e805fe7d70e48c87bf6d` |
 | `26年团线下-一楼.ply` | `26cf9a1da51f2aa75143` |
 | `26年团线下-二楼.ply` | `ac915831bf0760ed5d5d` |
 | `26年团线下-宝可梦.ply` | `0e3de3718003d5303632` |
@@ -24,7 +25,7 @@ git lfs pull --include="assets/*.ply"
 
 ```sh
 npm ci
-npm run convert -- "assets/26年贝拉线下演唱会.ply"
+npm run convert -- "assets/26年贝拉线下演唱会-白天.ply"
 npm run dev
 ```
 

@@ -1,0 +1,14 @@
+{
+  "id": "e805fe7d70e48c87bf6d",
+  "sourceName": "26年贝拉线下演唱会-晚上.ply",
+  "sourceBytes": 437489310,
+  "sourceCount": 1853762,
+  "levels": 7,
+  "settings": {
+    "converter": "3.6.6",
+    "pipeline": 1,
+    "chunkK": 128,
+    "coarseCount": 40000,
+    "shBands": 3
+  }
+}
