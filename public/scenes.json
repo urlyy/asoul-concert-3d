@@ -1,5 +1,5 @@
 {
-  "defaultScene": "3e0745269566bd40c913",
+  "defaultScene": "26cf9a1da51f2aa75143",
   "showSwitcher": true,
   "scenes": [
     {
@@ -76,9 +76,9 @@
       }
     },
     {
-      "id": "3e0745269566bd40c913",
+      "id": "26cf9a1da51f2aa75143",
       "name": "26年团线下-一楼",
-      "url": "scenes/3e0745269566bd40c913/lod-meta.json",
+      "url": "scenes/26cf9a1da51f2aa75143/lod-meta.json",
       "rotation": [
         0,
         0,

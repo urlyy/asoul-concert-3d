@@ -1,0 +1,14 @@
+{
+  "id": "26cf9a1da51f2aa75143",
+  "sourceName": "26年团线下-一楼.ply",
+  "sourceBytes": 405986142,
+  "sourceCount": 1720274,
+  "levels": 7,
+  "settings": {
+    "converter": "3.6.6",
+    "pipeline": 1,
+    "chunkK": 128,
+    "coarseCount": 40000,
+    "shBands": 3
+  }
+}
