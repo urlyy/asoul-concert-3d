@@ -139,7 +139,7 @@ npm run convert -- assets/新场景.ply --chunk-k 64 --coarse-count 20000 --sh-b
 
 ## 部署实现与缓存
 
-COS 指腾讯云对象存储服务（Cloud Object Storage），用于托管 Toy 从外部加载的场景分块。本地运行不依赖 COS。
+Toy 从外部对象存储加载场景分块，本地运行不依赖对象存储。雨云 ROS 的资源根目录为 `https://cn-nb1.rains3.com/asoul/`；腾讯云 COS（Cloud Object Storage）保留用于旧页面及回退。
 
 ### 普通静态部署
 
@@ -150,15 +150,37 @@ npm run preview
 
 预览确认后，将 `dist/` 的完整内容上传到静态托管服务。Cloudflare Pages 使用构建命令 `npm run build`、输出目录 `dist`；可在生产和预览环境设置 `GIT_LFS_SKIP_SMUDGE=1`，跳过源 PLY 下载。场景目录与完整分块必须先提交到 GitHub；不将整个仓库作为发布目录。
 
-### Toy 与 COS 发布
+### Toy 与对象存储发布
 
-将完整的 `public/scenes/` 上传到 COS，在 `toy-build.config.json` 的 `assetBaseUrl` 设置 HTTPS 根目录，确保该地址下可访问 `scenes/<版本>/lod-meta.json`。分块需要匿名可读，并允许 Toy 页面跨域访问。
+将完整的 `public/scenes/` 上传到对象存储，在 `toy-build.config.json` 的 `assetBaseUrl` 设置 HTTPS 根目录，确保该地址下可访问 `scenes/<版本>/lod-meta.json`。雨云采用路径式桶地址，根目录应为 `https://cn-nb1.rains3.com/asoul/`，不要再追加一层 `scenes/`。分块需要匿名可读，并允许 Toy 页面跨域访问。
 
 ```sh
 npm run build:toy
 ```
 
-将生成的 `dist-toy.zip` 上传到 Toy。构建不会上传 COS 或发布 Toy。新增场景时，先上传完整的新版本分块，再重新打包并上传 ZIP。
+将生成的 `dist-toy.zip` 上传到 Toy。构建不会上传对象存储或发布 Toy。新增场景时，先上传完整的新版本分块，再重新打包并上传 ZIP。
+
+### 雨云 ROS 迁移流程与切换记录
+
+2026-10-23：用户报告曾单日产生约 33GB 访问流量，关注大流量下的成本，要求保留雨云 ROS 的接入方法，待后续明确要求时切换。当时使用腾讯云上海 COS，仅记录方案，未创建雨云资源、上传数据或切换线上地址。
+
+2026-10-27：按用户要求迁移至宁波节点 `https://cn-nb1.rains3.com` 的 `asoul` 桶。已上传并逐文件校验完整的 8 个版本目录（7 个在菜单中，历史版本一并保留），共 1,288 个场景文件、587,803,649 字节；未上传源 PLY。匿名 GET 内容与本地 SHA-256 一致，带 Toy Origin 的响应允许跨域，版本资源返回 `public, max-age=31536000, immutable`。节点实际返回通配 CORS 响应，无需另写桶级 CORS 规则；Toy 内容页实际 Origin 是 `https://www.bilibilitoy.com`，外层入口为 `https://www.bilibili.com`，将来收紧规则时需核对两者。
+
+已更新 `toy-build.config.json`，执行 `npm run build:toy`、`npm run test:toy`（3 项通过）和 Toy 内容预检。真实 Toy 预览在本机 Chrome/WebGPU 中验证了全部 7 个场景的跨域加载与细化、阻断精细请求时粗略 LOD 独立显示，以及默认场景的手机横屏触摸设备模拟；不代表 iPhone/Safari 或 Android 真机验证。现有 Toy 为 `43988002536448`（`A-SOUL 场景重建`，slug `asoul-3d`），用户确认后已通过 Toy CLI 提交雨云版审核，返回状态 `auditing`，本次提交预览为 `https://www.bilibili.com/toy/preview/author_3XS9CMwj/index.html`；前述真实浏览器验证使用同一包体的初次预览 `https://www.bilibili.com/toy/preview/author_YTbC1jJ7/index.html`。尚未确认审核通过或正式入口切换。旧 COS 资源未删除，本机旧包备份于被忽略的 `.cache/toy-rollback/2026-10-27-dist-toy-cos.zip`。审核通过并验证正式入口后更新本记录。
+
+- 雨云支持通过控制台提供的默认 HTTPS 域名公开读取对象，不需要先购买自有域名。使用实际节点端点，不凭示例猜测域名；路径式地址为 `https://<节点域名>/<桶名>/`。
+- 优先评估宁波流量套餐。当天公开套餐 API 显示在售月费：10 元含 10GB 存储及 50GB 流量；15 元含 20GB/100GB；24 元含 40GB/200GB；45 元含 80GB/400GB；100 元含 200GB/1024GB。宁波超额流量单价为 0.1 元/GB，超额存储为 0.5 元/GB/月。价格与可售状态在实际切换前重新查询，不把单日峰值当作每天持续用量，不按停售免费套餐估算。来源：[公开套餐 API](https://api.v2.rainyun.com/product/ros/plans)、[默认域名使用教程](https://www.rainyun.com/docs/guide/ros/rainyun-ros-picgo/)。
+- Toy 继续承载前端，ROS 仅承载场景分块。文件可公开读取不等同于已验证可托管整个网页；每次迁移都要验证真实 Toy 内容页的跨域加载。
+
+收到切换要求后按以下顺序执行：
+
+1. 确认已有 ROS 实例、区域、桶名、实际 HTTPS 端点和可用上传授权；账号开通或购买由用户完成。上传密钥只通过本机安全配置使用，不能写入仓库、前端、ZIP 或日志。
+2. 在目标桶中启用场景对象的匿名读取，上传完整 `public/scenes/`，保留 `scenes/<版本>/...` 结构及所有历史版本。不要上传源 PLY，不要用会删除目标旧文件的同步选项。关闭图片优化，数值 WebP 必须保持原字节。
+3. 设置桶的 CORS：允许实际 Toy 预览及发布页面的 Origin 使用 GET、HEAD；如客户端触发预检，允许其实际请求头。先验证 ROS 对默认域名的 CORS 支持，防盗链及防火墙规则也必须允许实际页面请求。配置 `Cache-Control: public, max-age=31536000, immutable` 于版本分块，保留正确的文件类型。
+4. 用真实地址验证每个场景的 `lod-meta.json` 和完整分块可读取、文件大小及内容匹配；带实际页面 Origin 检查 CORS 响应。完成实际浏览器跨域加载、粗略 LOD、细化及手机访问检查后再发布，不能只以 HTTP 200 判断成功。
+5. 将 `toy-build.config.json` 的 `assetBaseUrl` 改为桶的 HTTPS 目录，末尾保留 `/`，例如 `https://<节点域名>/<桶名>/`；程序会在后面拼接 `scenes/<版本>/...`，不要在该配置末尾重复添加 `scenes/`。路径式桶地址受现有 URL 解析支持，无需改加载器。
+6. 执行 `npm run build:toy` 和 `npm run test:toy`，检查生成目录使用新地址；本地模拟测试不能代替对实际 ROS 的跨域和浏览器检查。按用户授权的发布范围更新 Toy ZIP，线上预览及正式入口验证完成后才报告切换成功。只改配置或只构建不代表线上已切换。
+7. 保留 COS 完整资源和旧 Toy 包供回退；需要回退时恢复旧 `assetBaseUrl`，重新构建并发布。当前回退地址为 `https://asoul-gaussian-1312521118.cos.ap-shanghai.myqcloud.com/`。旧页面仍可能继续请求 COS，因此迁移后不立即删除旧桶或旧版本。
 
 ### 缓存
 
@@ -249,6 +271,6 @@ npm test
 - `.gitignore` 排除依赖、构建、缓存、测试报告、日志、环境文件和未声明的本地素材；转换清单的临时文件为 `public/scenes.<pid>.json`。
 - 普通 `npm run build` 保持 `check-data.mjs` + Vite，不新增构建后产物检查。`check-data.mjs` 仅校验目录结构和索引是否存在；完整分块验证由已有测试负责。
 - Toy 构建需要系统 `zip`，输出 ZIP 根目录直接包含 `index.html`；现有脚本检查解压后总大小及 ZIP 小于 50 MB、入口不超过 1 MB。普通构建不使用这套限制。
-- Toy 场景更新后应重新打包目录。只更新 COS 的 `scenes.json` 不会改变 Toy 包内菜单。保留旧版分块，禁止对数值 WebP 做图片优化。
+- Toy 场景更新后应重新打包目录。只更新对象存储的 `scenes.json` 不会改变 Toy 包内菜单。保留旧版分块，禁止对数值 WebP 做图片优化。
 - `npm run test:toy` 使用本地分块模拟远程响应，在 `/tour/` 下验证跨域路径、粗略 LOD 和缺失索引；不代表 Toy 线上预览已通过。
 - 缺失分块时恢复完整版本目录，或移走损坏的本地版本目录后重新转换；不能只保留 `conversion.json` 缓存标记。
